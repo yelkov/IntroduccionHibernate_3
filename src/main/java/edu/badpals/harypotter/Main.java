@@ -1,9 +1,7 @@
 package edu.badpals.harypotter;
 
 import edu.badpals.harypotter.entities.*;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -41,11 +39,11 @@ public class Main {
             e.printStackTrace();
         }
 
-        Course astronomy = em.find(Course.class, 6);
+        Course astronomy = getCourse(em,"Astronomy");
         Enrollment matriculaLily = new Enrollment();
         EnrollmentId ids = new EnrollmentId();
-        ids.setCourseEnrollment(6);
-        ids.setPersonEnrollment(111);
+        ids.setCourseEnrollment(astronomy.getId());
+        ids.setPersonEnrollment(lily.getId());
         matriculaLily.setId(ids);
         matriculaLily.setCourseEnrollment(astronomy);
         matriculaLily.setPersonEnrollment(lily);
@@ -59,5 +57,23 @@ public class Main {
             e.printStackTrace();
         }
 
+    }
+
+    public static Course getCourse(EntityManager em ,String courseName){
+        try{
+            Query query = em.createQuery("SELECT c FROM Course c WHERE c.name = :name");
+            query.setParameter("name", courseName);
+            Course course = (Course) query.getSingleResult();
+            return course;
+        } catch (NoResultException e) {
+            System.out.println("Curso no encontrado.");
+        }catch (NonUniqueResultException e) {
+            System.out.println("Error: Se encontraron múltiples cursos con el mismo nombre.");
+        }
+        catch (Exception e) {
+            System.out.println("Error al seleccionar curso.");
+            e.printStackTrace();
+        }
+        return null;
     }
 }
